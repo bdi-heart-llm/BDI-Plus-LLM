@@ -1,0 +1,46 @@
+# --- Sensitive Data ---
+# Never commit files containing passwords or API keys
+secrets.json
+config.local.json
+credentials.json
+.env
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.log
+
+# --- OS Generated ---
+.DS_Store
+Thumbs.db
+
+# --- Dependency Folders (if applicable) ---
+node_modules/
+venv/
+__pycache__/
+
+# --- Large Data / Build Artifacts ---
+dist/
+build/
+out/
+data/temp/
+
+# --- Gradle ---
+.gradle/
+
+# Ignore the Gradle Wrapper executable if you don't want it (though usually recommended to keep)
+# !gradlew
+# !gradlew.bat
+# !gradle/wrapper/gradle-wrapper.jar
+
+# --- Cache and Temp files ---
+bin/
+.gradle-test-kit/
+
+# --- IDEs (IntelliJ / Android Studio) ---
+*.iml
+*.iws
+.project
+.settings/
+.classpath
