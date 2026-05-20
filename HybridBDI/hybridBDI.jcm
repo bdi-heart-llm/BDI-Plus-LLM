@@ -1,0 +1,12 @@
+mas lab_agent {
+    agent hybrid_agent : hybrid_agent.asl{
+        join: main
+    }
+
+    workspace main {
+        artifact labEnv: wot.ThingArtifact("https://raw.githubusercontent.com/Interactions-HSG/example-tds/refs/heads/was/tds/interactions-lab.ttl")
+        artifact labSensor: lab.LabSensor()
+        artifact userMessageChannel: messagechannel.MessageChannel()
+        artifact clientLLM: llm.OllamaClient()
+    }
+}

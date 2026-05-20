@@ -1,50 +1,45 @@
 # Hybrid BDI + LLM Agent Runtime Log
 
 ## Runtime Agent execution
-The hybrid BDI + LLM agent received natural language commands from the user, queued them, and sent them to the LLM for interpretation. The LLM translated the requests into structured actions such as turning lights ON or OFF.
-
-The Jason agent then processed these actions as events, checked the current environment state, and executed the corresponding plans (`turn_on` / `turn_off`) on the smart lab devices.
-
-During processing, the queue temporarily locked the LLM to avoid concurrent requests, then resumed normal operation once execution completed.
 ```text
-Runtime Services (RTS) is running at 192.168.1.124:61514
-Agent mind inspector is running at http://192.168.1.124:3272
-CArtAgO Http Server running on http://192.168.1.124:3273
-Runtime Services (RTS) is running at 192.168.1.124:61514
-Agent mind inspector is running at http://192.168.1.124:3272
-CArtAgO Http Server running on http://192.168.1.124:3273
-[hybrid_a] [LLM] Available
-[hybrid_a] Booting up...
-[hybrid_a] [QUEUE] Empty
-[hybrid_a] [CHAT] Connected
-[hybrid_a] Linking complete → start sensing
-[hybrid_a] [CHAT] Received: turn on the light in z1
-[hybrid_a] [QUEUE] Size: 1
-[hybrid_a] [LLM] Busy / unavailable
-[hybrid_a] [LLM] Dispatching batch
-[hybrid_a] [LLM] Payload: turn on the light in z1
-[llmEngine] LLM raw response: {"action":"should_be","state":"ON","element":"Z1Light"}
-[hybrid_a] OK! Z1Light should be on.
-[hybrid_a] [ACTION] ON  -> Z1Light
-[hybrid_a] [LLM] Available
-[hybrid_a] [QUEUE] Empty
-[hybrid_a] [LLM] Available again
-[hybrid_a] [QUEUE] Empty
-[hybrid_a] [CHAT] Received: turn off the lights
-[hybrid_a] [QUEUE] Size: 1
-[hybrid_a] [LLM] Busy / unavailable
-[hybrid_a] [LLM] Dispatching batch
-[hybrid_a] [LLM] Payload: turn off the lights
-[llmEngine] LLM raw response: [
-{"action":"should_be","state":"OFF","element":"Z1Light"},
-{"action":"should_be","state":"OFF","element":"Z2Light"}
-]
-[hybrid_a] OK! Z1Light should be off.
-[hybrid_a] OK! Z2Light should be off.
-[hybrid_a] [ACTION] OFF -> Z1Light
-[hybrid_a] [ACTION] OFF -> Z2Light
-[hybrid_a] [LLM] Available
-[hybrid_a] [QUEUE] Empty
-[hybrid_a] [LLM] Available again
-[hybrid_a] [QUEUE] Empty
+[clientLLM] user input: turn on light in zone 1
+[clientLLM] agentKnowledgeContext: 
+
+[PROCEDURAL_MEMORY]
+"execute_action_on_element" = ["Z1Light","Control Lights Z1",boolean] // "Turns the lights on or off in Zone 1"
+"execute_action_on_element" = ["Z2Light","Control Lights Z2",boolean] // "Turns the lights on or off in Zone 2"
+"execute_action_on_element" = ["Z1Blinds","Control Blinds Z1",boolean] // "Opens or closes the window blinds in Zone 1"
+"execute_action_on_element" = ["Z2Blinds","Control Blinds Z2",boolean] // "Opens or closes the window blinds in Zone 2"
+
+
+[SHORT_TERM_MEMORY]
+"Sunshine" = 644.4255632794432
+"Z1Level" = 0
+"Z2Blinds" = false
+"TotalEnergyCost" = 24
+"Z1Light" = false
+"Z2Light" = false
+"Z1Blinds" = false
+"EnergyCost" = 100
+"Z2Level" = 0
+
+
+[SEMANTIC_MEMORY]
+zones = "There are zone one and zone two in the lab"
+zone_one = "Zone one has Z1Light and Z1Blinds"
+zone_two = "Zone one has Z2Light and Z2Blinds"
+
+
+[EPISODIC_MEMORY]
+"It's dark in zone 1" = "User described an undesired state. Working memory: Z1Light=false, Z1Blinds=false. Both can contribute to fixing the condition. Output: [{"functor":"achieve","params":{"action":"execute_action_on_element","args":["Z1Light","Control Lights Z1",true]}},{"functor":"achieve","params":{"action":"execute_action_on_element","args":["Z1Blinds","Control Blinds Z1",true]}}]"
+"Zone 1 has been dark all morning" = "User made a past-tense observation. No procedural action triggered. Added new belief about room condition. Output: [{"functor":"tell","params":["Z1","dark"]}]"
+"Why is zone 1 so dark?" = "User asked an explicit question. No action delegated, no belief revised. Output: [{"functor":"msg_fail","params":["Wht is the reason zone 1 so currently dark?."]}]"
+
+[clientLLM] LLM raw response: [{"functor":"achieve","params":{"action":"execute_action_on_element","args":["Z1Light","Control Lights Z1",true]}}]
+[hybrid_agent] execute_action_on_element("Z1Light","Control Lights Z1",true)
+[hybrid_agent] [Control Lights Z1] Z1Light -> true (type: boolean)
+[hybrid_agent] [LLM] LLM is up and ready.
+[hybrid_agent] [QUEUE] Empty
+[hybrid_agent] [LLM] Available again
+[hybrid_agent] [QUEUE] Empty
 ```

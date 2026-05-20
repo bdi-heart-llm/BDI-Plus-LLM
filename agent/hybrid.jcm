@@ -1,8 +1,0 @@
-
-mas hybrid {
-
-    agent hybrid_a: hybrid_agent.asl
-
-    
-
-}
